@@ -1,0 +1,30 @@
+.sudoku-container {
+    width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.sudoku-grid {
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.sudoku-grid td {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2em;
+    border: 1px solid #bbb;
+    background: #fff;
+}
+
+.sudoku-grid tr:nth-child(3n) td {
+    border-bottom: 2px solid #333;
+}
+
+.sudoku-grid td:nth-child(3n) {
+    border-right: 2px solid #333;
+}
