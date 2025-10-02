@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('/api/sudoku')
         .then(response => response.json())
         .then(data => {
+            console.log(data); // <-- Add this line
             // Use the correct property from the API response
             const board = data.grid;
             const container = document.querySelector('.sudoku-container');
