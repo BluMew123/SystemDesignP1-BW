@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/api/sudoku')
+    fetch('/api/sudokugenerate')
         .then(response => response.json())
         .then(data => {
             console.log(data); // <-- Add this line

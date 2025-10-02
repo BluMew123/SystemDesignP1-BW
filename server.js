@@ -8,7 +8,7 @@ const PORT = 3000;
 app.use(express.static(path.join(__dirname)));
 
 // Example API endpoint
-app.get('/api/sudoku', (req, res) => {
+app.get('/api/sudokugenerate', (req, res) => {
     let url = 'https://api.api-ninjas.com/v1/sudokugenerate?width=3&height=3&difficulty=medium';
     let options = {
         method: 'GET',
