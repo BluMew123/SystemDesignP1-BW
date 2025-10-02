@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+// const fetch = require('node-fetch');
 
 let url = 'https://api.api-ninjas.com/v1/sudokugenerate?width=3&height=3&difficulty=medium';
 
@@ -14,3 +14,5 @@ fetch(url, options)
   .then(res => res.json())
   .then(json => console.log(json))
   .catch(err => console.error('error:' + err));
+
+ 
