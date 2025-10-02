@@ -2,8 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('/api/sudoku')
         .then(response => response.json())
         .then(data => {
-            // Assuming the API returns a 2D array called 'board'
-            const board = data.board;
+            // Use the correct property from the API response
+            const board = data.grid;
             const container = document.querySelector('.sudoku-container');
             
             // Create table
