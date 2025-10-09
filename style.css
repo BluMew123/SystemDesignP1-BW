@@ -28,3 +28,43 @@
 .sudoku-grid td:nth-child(3n) {
     border-right: 2px solid #974525;
 }
+
+.sudoku-grid input {
+   display: inline-flex;
+    height: 1024px;
+    padding: 328px 169px 345px 170px;
+    flex-direction: column;
+    align-items: center;
+    gap: 67px;
+}
+
+.h1 {
+    color: #000;
+text-align: center;
+font-family: "Josefin Sans";
+font-size: 128px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+}
+
+.button {
+    width: 760px;
+    height: 156px;
+    flex-shrink: 0;
+    border-radius: 38px;
+    background: linear-gradient(90deg, rgba(254, 213, 156, 0.75) 0%, rgba(201, 97, 69, 0.75) 100%);
+     border: none; /* remove default border */
+  cursor: pointer;
+  display: flex; /* so you can center text */
+  justify-content: center; /* horizontal centering */
+  align-items: center; 
+  color: #000;
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  text-align: center;
+}
+
