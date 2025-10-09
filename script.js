@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Create table
             const table = document.createElement('table');
-            table.className = 'sudoku-grid';
+            table.className = 'sudoku-puzzle';
             
             for (let i = 0; i < board.length; i++) {
                 const row = document.createElement('tr');
