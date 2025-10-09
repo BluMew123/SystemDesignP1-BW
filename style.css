@@ -21,10 +21,10 @@
     background: #FFE4D6;
 }
 
-/* .sudoku-grid tr:nth-child(3n) td {
-    border-bottom: 2px solid #333;
+.sudoku-grid tr:nth-child(3n) td {
+    border-bottom: 2px solid #974525;
 }
 
 .sudoku-grid td:nth-child(3n) {
-    border-right: 2px solid #333;
-} */
+    border-right: 2px solid #974525;
+}
