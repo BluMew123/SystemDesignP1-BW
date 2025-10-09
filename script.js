@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = document.createElement('tr');
                 for (let j = 0; j < board[i].length; j++) {
                     const cell = document.createElement('td');
+                    // add row and column classes for styling
+                    cell.classList.add(`row-${i+1}`, `col-${j+1}`);
                     cell.textContent = board[i][j] !== 0 ? board[i][j] : '';
                     row.appendChild(cell);
                 }

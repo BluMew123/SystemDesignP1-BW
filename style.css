@@ -56,7 +56,7 @@ line-height: normal;
     background: linear-gradient(90deg, rgba(254, 213, 156, 0.75) 0%, rgba(201, 97, 69, 0.75) 100%);
      border: none; /* remove default border */
   cursor: pointer;
-  display: flex; /* so you can center text */
+  display: flex !important; /* so you can center text */
   justify-content: center; /* horizontal centering */
   align-items: center; 
   color: #000;
@@ -68,3 +68,6 @@ line-height: normal;
   text-align: center;
 }
 
+.sudoku-grid td.col-3 {
+    background-color: #f0f8ff; /* Light blue background for column 3 */
+}
