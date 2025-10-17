@@ -35,13 +35,13 @@
 }
 
 /* optional: keep stronger borders for 3x3 boxes */
-/* .sudoku-grid tr:nth-child(3n) td {
+.sudoku-grid tr:nth-child(3n) td {
     border-bottom: 2px solid #974525;
 }
 
 .sudoku-grid td:nth-child(3n) {
     border-right: 2px solid #974525;
-} */
+}
 
 .sudoku-grid input {
    display: inline-flex;
@@ -82,6 +82,6 @@ line-height: normal;
   text-align: center;
 }
 
-.sudoku-grid td.col-3 {
+/* .sudoku-grid td.col-3 {
     background-color: #f0f8ff; /* Light blue background for column 3 */
-}
+} */
