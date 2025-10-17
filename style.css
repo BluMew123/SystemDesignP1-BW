@@ -19,15 +19,29 @@
     font-size: 1.2em;
     border: 1px solid #D99069;
     background: #FFE4D6;
+    transition: background-color 150ms ease, color 150ms ease;
 }
 
-.sudoku-grid tr:nth-child(3n) td {
+/* selected single cell */
+.cell-selected {
+    background-color: #D99069 !important; /* specific color for clicked cell */
+    color: #000;
+}
+
+/* related row/column/box cells */
+.cell-related {
+    background-color: #FAC8AE !important; /* different color for row/col/box */
+    color: #000;
+}
+
+/* optional: keep stronger borders for 3x3 boxes */
+/* .sudoku-grid tr:nth-child(3n) td {
     border-bottom: 2px solid #974525;
 }
 
 .sudoku-grid td:nth-child(3n) {
     border-right: 2px solid #974525;
-}
+} */
 
 .sudoku-grid input {
    display: inline-flex;

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(data); // debug API response
 
             // accept multiple possible property names returned by different APIs
-            const board = data.grid || data.puzzle || data.board || data;
+            const board = data.puzzle || data.grid || data.board || data;
             const container = document.querySelector('.sudoku-container');
 
             if (!Array.isArray(board) || board.length === 0) {
@@ -47,6 +47,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
             container.innerHTML = ''; // Clear previous content
             container.appendChild(table);
+
+            // --- ADDED: highlight behavior on cell click ---
+            // clicked cell -> .cell-selected
+            // same row/col/box -> .cell-related
+            table.addEventListener('click', (event) => {
+                const td = event.target.closest('td');
+                if (!td) return;
+
+                // clear previous highlights
+                document.querySelectorAll('.cell-selected, .cell-related').forEach(el => {
+                    el.classList.remove('cell-selected', 'cell-related');
+                });
+
+                // highlight clicked cell
+                td.classList.add('cell-selected');
+
+                // get identifiers
+                const row = td.getAttribute('data-row');
+                const col = td.getAttribute('data-col');
+                const box = td.getAttribute('data-box');
+
+                // highlight related cells (same row OR same col OR same box), excluding clicked cell
+                const relatedSelector = `.cell.row-${row}, .cell.col-${col}, .cell.box-${box}`;
+                document.querySelectorAll(relatedSelector).forEach(el => {
+                    if (el !== td) el.classList.add('cell-related');
+                });
+            });
+            // --- end added behavior ---
         })
         .catch(error => {
             console.error('Error fetching Sudoku:', error);
