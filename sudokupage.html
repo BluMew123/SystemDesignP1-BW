@@ -4,24 +4,39 @@
     <meta charset="UTF-8">
     <title>Sudoku Game</title>
     <link rel="stylesheet" href="style.css">
-    <!-- <style>
-        .sudoku-container {
-            width: 400px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-    </style> -->
-
-    
 </head>
 <body>
     <div class="sudoku-header">Sudoku Puzzle Api</div>
-    <div class="sudoku-container">
-        <!-- Place your Sudoku grid or code here -->
+
+    <!-- layout: board on left, keypad on right -->
+    <div class="sudoku-area">
+        <div class="sudoku-container">
+            <!-- grid will be rendered here -->
+        </div>
+
+        <!-- keypad (3x3) + 3 control buttons below -->
+        <div class="sudoku-keypad" aria-hidden="false">
+            <div class="keypad-grid">
+                <!-- replace src with your SVG files, filenames shown as placeholders -->
+                <button class="keypad-btn" data-value="1"><img src="img/num-1.svg" alt="1"></button>
+                <button class="keypad-btn" data-value="2"><img src="img/num-2.svg" alt="2"></button>
+                <button class="keypad-btn" data-value="3"><img src="img/num-3.svg" alt="3"></button>
+                <button class="keypad-btn" data-value="4"><img src="img/num-4.svg" alt="4"></button>
+                <button class="keypad-btn" data-value="5"><img src="img/num-5.svg" alt="5"></button>
+                <button class="keypad-btn" data-value="6"><img src="img/num-6.svg" alt="6"></button>
+                <button class="keypad-btn" data-value="7"><img src="img/num-7.svg" alt="7"></button>
+                <button class="keypad-btn" data-value="8"><img src="img/num-8.svg" alt="8"></button>
+                <button class="keypad-btn" data-value="9"><img src="img/num-9.svg" alt="9"></button>
+            </div>
+
+            <div class="keypad-controls">
+                <button id="generate-btn" class="control-btn"><img src="img/generatenewpuzzle-button.svg" alt="Generate"></button>
+                <button id="check-btn" class="control-btn"><img src="img/checkanswer-button.svg" alt="Check"></button>
+                <button id="solve-btn" class="control-btn"><img src="img/solvepuzzle-button.svg" alt="Solve"></button>
+            </div>
+        </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
