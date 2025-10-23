@@ -2,7 +2,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100%;               /* span entire viewport width */
     height: 102px;
     z-index: 1000;
 
@@ -20,12 +20,12 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
-/* reference frame (1440 x 1024) */
+/* ensure content is pushed below the fixed header */
 .frame {
     width: 1440px;
     height: 1024px;
     margin: 0 auto;
-    position: relative; /* absolute children positioned relative to this frame */
+    position: relative;
     box-sizing: border-box;
     padding-top: 122px; /* header height (102) + 20px spacing */
 }
@@ -66,6 +66,46 @@
     box-sizing: border-box;
 }
 
+.h1 {
+    color: #000;
+text-align: center;
+font-family: "Josefin Sans";
+font-size: 128px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+}
+
+.titlepagetext {
+    color: #000;
+text-align: center;
+font-family: "Josefin Sans";
+font-size: 128px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+}
+
+.buttonfrontpage{
+    width: 760px;
+    height: 156px;
+    flex-shrink: 0;
+    border-radius: 38px;
+    background: linear-gradient(90deg, rgba(254, 213, 156, 0.75) 0%, rgba(201, 97, 69, 0.75) 100%);
+     border: none; /* remove default border */
+  cursor: pointer;
+  display: flex !important; /* so you can center text */
+  justify-content: center; /* horizontal centering */
+  align-items: center; 
+  color: #000;
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 45px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  text-align: center;
+}
+
 /* keep existing selection/related/result styles (no change) */
 .cell-selected {
     background-color: #D99069 !important;
@@ -95,19 +135,18 @@
 /* Keypad positioning: use requested offsets (top:195, left:891, right:149, bottom:407)
    This yields keypad width = 1440 - 891 - 149 = 400, height = 1024 - 195 - 407 = 422 */
 .sudoku-keypad {
-    position: absolute;
-    top: 195px;
-    left: 891px;
-    width: 400px;
-    height: 422px;
-    padding: 0;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    overflow: visible; /* allow controls to extend beyond keypad box */
+  position: absolute;
+  top: 195px;
+  left: 891px;
+  width: 400px;
+  height: auto;                /* allow it to grow naturally */
+  display: flex;
+  flex-direction: column;
+  align-items: center;         /* centers keypad + controls */
+  justify-content: flex-start;
+  overflow: visible;
 }
+
 
 /* 3x3 keypad grid (Stays centered inside the keypad area) */
 .keypad-grid {
@@ -144,20 +183,20 @@
     pointer-events: none;
 }
 
-/* place the three control buttons in one horizontal row, no wrapping */
+/* controls are positioned relative to .frame (frame is position:relative) */
 .keypad-controls {
-    position: absolute;
-    top: 635px;        /* stays below keypad; adjust if needed */
-    left: 891px;       /* align with keypad left */
-    width: 400px;      /* container width matches generate button */
-    display: flex;
-    flex-direction: column; /* stack buttons vertically */
-    gap: 31px;         /* spacing between buttons */
-    align-items: center; /* center each button horizontally */
-    justify-content: flex-start;
-    z-index: 900;
-    box-sizing: border-box;
+  /* display: flex; */
+  justify-content: center; /* center all buttons horizontally */
+  align-items: center;     /* vertically align them if needed */
+  gap: 20px;               /* 20px space between buttons */
+  margin-top: 20px;        /* small gap under the 3x3 keypad */
+  width: 100%;             /* take full width of parent */
+  position: relative;      /* keep natural flow, no absolute positioning */
 }
+
+
+
+
 
 /* control button sizes (as requested) */
 #generate-btn {
@@ -170,21 +209,31 @@
     height: 82px;
 }
 
-/* ensure buttons keep image filling */
+/* ensure images fill the full button area */
 .control-btn {
     padding: 0;
     border: none;
-    background: transparent;
-    cursor: pointer;
-    border-radius: 10px;
-    overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
 }
 .control-btn img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+
+#generate-btn {
+    width: 400px;
+    height: 82px;
+}
+#check-btn,
+#solve-btn {
+    width: 235px;
+    height: 82px;
 }
