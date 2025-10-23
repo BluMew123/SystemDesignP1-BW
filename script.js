@@ -1,10 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.querySelector('.sudoku-container');
+    const keypadArea = document.querySelector('.sudoku-keypad');
+    const generateBtn = document.getElementById('generate-btn');
+    const checkBtn = document.getElementById('check-btn');
+    const solveBtn = document.getElementById('solve-btn');
+
     let currentBoard = null;       // puzzle as generated (.puzzle)
     let selectedCell = null;       // DOM td element currently selected
     let lastSolution = null;       // cached solution from /api/sudokusolve
 
-    // helper: render board (expects 2D array)
+    // render the board (expects 2D array)
     function renderBoard(board) {
         currentBoard = board;
         lastSolution = null; // clear cached solution when new puzzle loaded
@@ -29,12 +34,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.setAttribute('data-col', colNum);
                 cell.setAttribute('data-box', boxNum);
 
-                // original puzzle value: non-zero fixed numbers should be marked readonly
                 const val = board[i][j];
                 cell.textContent = val !== 0 ? val : '';
                 if (val !== 0) {
                     cell.classList.add('cell-fixed');
                     cell.setAttribute('data-fixed', '1');
+                    // expose prefilled value in DOM for inspection
+                    cell.setAttribute('data-value', String(val));
+                } else {
+                    // ensure no leftover attributes on empty cells
+                    cell.removeAttribute('data-value');
+                    cell.removeAttribute('data-user');
                 }
 
                 row.appendChild(cell);
@@ -44,34 +54,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         container.innerHTML = '';
         container.appendChild(table);
+    }
 
-        // click handling for selection (delegated)
-        table.addEventListener('click', (event) => {
-            const td = event.target.closest('td');
-            if (!td) return;
+    // select a cell and apply highlights
+    function selectCell(td) {
+        if (!td || !td.matches('td.cell')) return;
+        clearHighlights(false); // keep selectedCell cleared then set below
+        selectedCell = td;
+        td.classList.add('cell-selected');
 
-            // ignore clicks on fixed cells for selection? still allow selection to see hints
-            // clear previous selection/related/result highlights
-            clearHighlights();
+        // debug log
+        console.log('selected cell:', td.id);
 
-            selectedCell = td;
-            td.classList.add('cell-selected');
+        const row = td.getAttribute('data-row');
+        const col = td.getAttribute('data-col');
+        const box = td.getAttribute('data-box');
 
-            const row = td.getAttribute('data-row');
-            const col = td.getAttribute('data-col');
-            const box = td.getAttribute('data-box');
-
-            // highlight related
-            const relatedSelector = `.cell.row-${row}, .cell.col-${col}, .cell.box-${box}`;
-            document.querySelectorAll(relatedSelector).forEach(el => {
-                if (el !== td) el.classList.add('cell-related');
-            });
+        const relatedSelector = `.cell.row-${row}, .cell.col-${col}, .cell.box-${box}`;
+        document.querySelectorAll(relatedSelector).forEach(el => {
+            if (el !== td) el.classList.add('cell-related');
         });
     }
 
     // clear selection, related and result highlights
-    function clearHighlights() {
-        selectedCell = null;
+    // if clearSelection === true, also unset selectedCell
+    function clearHighlights(clearSelection = true) {
+        if (clearSelection) selectedCell = null;
         document.querySelectorAll('.cell-selected, .cell-related, .cell-correct, .cell-incorrect').forEach(el => {
             el.classList.remove('cell-selected', 'cell-related', 'cell-correct', 'cell-incorrect');
         });
@@ -80,9 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // load a generated puzzle from server and render
     function loadGeneratedPuzzle() {
         fetch('/api/sudokugenerate')
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to fetch puzzle');
+                return r.json();
+            })
             .then(data => {
-                // server responds with { puzzle: [...] }
                 const puzzle = data.puzzle || data;
                 if (!Array.isArray(puzzle) || puzzle.length === 0) {
                     container.innerHTML = '<p>Failed to load Sudoku puzzle.</p>';
@@ -99,9 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // request solution from server (/api/sudokusolve uses server-side stored puzzle)
     function fetchSolution() {
         return fetch('/api/sudokusolve')
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error('Failed to fetch solution');
+                return r.json();
+            })
             .then(data => {
-                // accept several possible response shapes
                 const sol = data.solution || data.puzzle || data.grid || data;
                 if (!Array.isArray(sol)) throw new Error('Invalid solution format');
                 lastSolution = sol;
@@ -109,84 +121,172 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // input number into selected cell (if not fixed)
+    // input number into selected cell (if not fixed) and update model
     function inputNumber(n) {
+        // guard against null/undefined so "null" doesn't appear
+        if (n == null) return;
         if (!selectedCell) return;
         if (selectedCell.getAttribute('data-fixed') === '1') return; // do not overwrite fixed
+
+        // update DOM
         selectedCell.textContent = String(n);
         selectedCell.setAttribute('data-user', String(n));
-        // remove previous result highlights for this cell
-        selectedCell.classList.remove('cell-correct', 'cell-incorrect');
+        selectedCell.setAttribute('data-value', String(n)); // visible in inspector
+        selectedCell.classList.remove('cell-incorrect');
+        selectedCell.classList.add('cell-user'); // mark as user-filled
+
+        // update currentBoard model so checks/solve use latest user input
+        const r = parseInt(selectedCell.getAttribute('data-row'), 10) - 1;
+        const c = parseInt(selectedCell.getAttribute('data-col'), 10) - 1;
+        if (Array.isArray(currentBoard) && currentBoard[r]) {
+            currentBoard[r][c] = Number(n);
+        }
     }
 
-    // check current board against solution; highlight each cell green/red
-    function checkAnswer() {
-        if (!currentBoard) return;
-        fetchSolution()
-            .then(solution => {
-                // solution is a 2D array matching currentBoard dims
-                const cells = document.querySelectorAll('.sudoku-grid td');
-                cells.forEach(td => {
-                    td.classList.remove('cell-correct', 'cell-incorrect');
-                    const r = parseInt(td.getAttribute('data-row'), 10) - 1;
-                    const c = parseInt(td.getAttribute('data-col'), 10) - 1;
-                    const expected = solution[r][c];
-                    const providedText = td.textContent.trim();
-                    const provided = providedText === '' ? 0 : parseInt(providedText, 10);
-                    if (provided === expected) {
-                        td.classList.add('cell-correct');
-                    } else {
-                        td.classList.add('cell-incorrect');
-                    }
-                });
-            })
-            .catch(err => {
-                console.error('Error fetching solution for check:', err);
-            });
+    // clear selected cell (keyboard / delete)
+    function clearSelectedCell() {
+        if (!selectedCell) return;
+        if (selectedCell.getAttribute('data-fixed') === '1') return;
+        selectedCell.textContent = '';
+        selectedCell.removeAttribute('data-user');
+        selectedCell.removeAttribute('data-value');
+        selectedCell.classList.remove('cell-user', 'cell-correct', 'cell-incorrect');
+
+        const r = parseInt(selectedCell.getAttribute('data-row'), 10) - 1;
+        const c = parseInt(selectedCell.getAttribute('data-col'), 10) - 1;
+        if (Array.isArray(currentBoard) && currentBoard[r]) {
+            currentBoard[r][c] = 0;
+        }
     }
 
-    // fill board with solution (solve)
-    function solveMyPuzzle() {
-        if (!currentBoard) return;
-        fetchSolution()
-            .then(solution => {
-                const cells = document.querySelectorAll('.sudoku-grid td');
-                cells.forEach(td => {
-                    const r = parseInt(td.getAttribute('data-row'), 10) - 1;
-                    const c = parseInt(td.getAttribute('data-col'), 10) - 1;
-                    td.textContent = solution[r][c];
-                    td.classList.remove('cell-incorrect');
-                    td.classList.add('cell-correct');
-                });
-            })
-            .catch(err => {
-                console.error('Error fetching solution for solve:', err);
-            });
-    }
+    // keyboard support: type 1-9 to input, Backspace/Delete/0 to clear
+    document.addEventListener('keydown', (ev) => {
+        if (!selectedCell) return;
+        // ignore when typing into other inputs (if any)
+        if (['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return;
 
-    // hookup keypad buttons (delegated)
-    document.addEventListener('click', (ev) => {
-        const kb = ev.target.closest('.keypad-btn');
-        if (kb) {
-            const val = kb.getAttribute('data-value');
-            if (val) inputNumber(parseInt(val, 10));
-        }
-        const gen = ev.target.closest('#generate-btn');
-        if (gen) {
-            clearHighlights();
-            loadGeneratedPuzzle();
-        }
-        const chk = ev.target.closest('#check-btn');
-        if (chk) {
-            clearHighlights();
-            checkAnswer();
-        }
-        const slv = ev.target.closest('#solve-btn');
-        if (slv) {
-            clearHighlights();
-            solveMyPuzzle();
+        const k = ev.key;
+        if (/^[1-9]$/.test(k)) {
+            ev.preventDefault();
+            inputNumber(Number(k));
+        } else if (k === 'Backspace' || k === 'Delete' || k === '0') {
+            ev.preventDefault();
+            clearSelectedCell();
         }
     });
+
+    // Delegated click handler for grid cells (attach once)
+    if (container) {
+        container.addEventListener('click', (ev) => {
+            const td = ev.target.closest('td.cell');
+            if (!td) return;
+            selectCell(td);
+        });
+    }
+
+    // Robust delegated click handler for keypad number buttons:
+    function handleKeypadClick(ev) {
+        const btn = ev.target.closest('.keypad-btn');
+        if (!btn) return false;
+        const val = btn.getAttribute('data-value');
+        if (!val) return false;
+        ev.preventDefault();
+        // ensure selectedCell still set (debug)
+        console.log('keypad clicked:', val, 'selectedCell before input:', selectedCell ? selectedCell.id : null);
+        inputNumber(parseInt(val, 10));
+        return true;
+    }
+
+    // attach keypad handler to keypadArea if present, otherwise fallback to document
+    if (keypadArea) {
+        keypadArea.addEventListener('click', handleKeypadClick);
+    } else {
+        document.addEventListener('click', (ev) => {
+            handleKeypadClick(ev);
+        });
+    }
+
+    // Hook up control buttons (generate / check / solve) - preserve existing behavior
+    if (generateBtn) generateBtn.addEventListener('click', () => { clearHighlights(); loadGeneratedPuzzle(); });
+    if (checkBtn) checkBtn.addEventListener('click', () => { clearHighlights(false); checkAnswer(); });
+    if (solveBtn) solveBtn.addEventListener('click', () => { clearHighlights(false); solveMyPuzzle(); });
+
+    // Replace or add this robust solver handler and wiring
+    async function solveMyPuzzle() {
+        try {
+            const res = await fetch('/api/sudokusolve');
+            const rawText = await res.text();
+
+            // log raw response for debugging
+            console.log('/api/sudokusolve raw response text:', rawText);
+
+            let data;
+            try {
+                data = JSON.parse(rawText);
+            } catch (e) {
+                console.warn('Response was not valid JSON, using text as message');
+                data = { message: rawText };
+            }
+
+            console.log('/api/sudokusolve parsed response:', data);
+
+            // Attempt to extract solution from multiple possible keys
+            let solution = null;
+            if (Array.isArray(data)) solution = data;
+            else if (Array.isArray(data.solution)) solution = data.solution;
+            else if (Array.isArray(data.puzzle)) solution = data.puzzle;
+            else if (Array.isArray(data.grid)) solution = data.grid;
+            else if (Array.isArray(data.board)) solution = data.board;
+
+            if (!solution) {
+                console.error('Invalid solution format from /api/sudokusolve', data);
+                return;
+            }
+
+            // ensure 9x9
+            if (!Array.isArray(solution) || solution.length !== 9 || !solution.every(row => Array.isArray(row) && row.length === 9)) {
+                console.error('Solution is not a 9x9 array', solution);
+                return;
+            }
+
+            // populate DOM cells and update model
+            const cells = document.querySelectorAll('.sudoku-grid td');
+            if (!cells || cells.length === 0) {
+                if (typeof renderBoard === 'function') {
+                    renderBoard(solution);
+                    currentBoard = solution.map(row => row.slice());
+                    return;
+                }
+                console.error('No sudoku grid found to populate.');
+                return;
+            }
+
+            cells.forEach(td => {
+                const r = parseInt(td.getAttribute('data-row'), 10) - 1;
+                const c = parseInt(td.getAttribute('data-col'), 10) - 1;
+                const val = solution[r][c] || 0;
+                td.textContent = String(val);
+                td.setAttribute('data-value', String(val));
+                td.removeAttribute('data-user');
+                td.classList.remove('cell-incorrect', 'cell-user');
+                td.classList.add('cell-correct');
+            });
+
+            currentBoard = solution.map(row => row.slice());
+        } catch (err) {
+            console.error('solveMyPuzzle error:', err);
+        }
+    }
+
+    // re-wire solve button
+    if (typeof solveBtn !== 'undefined' && solveBtn) {
+        try { solveBtn.removeEventListener('click', solveMyPuzzle); } catch(e){}
+        solveBtn.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            if (typeof clearHighlights === 'function') clearHighlights(false);
+            solveMyPuzzle();
+        });
+    }
 
     // initial load of a puzzle
     loadGeneratedPuzzle();
