@@ -1,3 +1,4 @@
+/* used AI heavily throughout this file, as I built my project with CoPilot */
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.querySelector('.sudoku-container');
     const keypadArea = document.querySelector('.sudoku-keypad');

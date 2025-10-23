@@ -1,3 +1,4 @@
+/* used AI heavily throughout this file, as I built my project with CoPilot */
 require('dotenv').config();
 
 const express = require('express');
