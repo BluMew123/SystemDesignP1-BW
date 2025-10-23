@@ -10,121 +10,105 @@
     color: #000;
 }
 
+/* reference frame (1440 x 1024) */
+.frame {
+    width: 1440px;
+    height: 1024px;
+    margin: 0 auto;
+    position: relative; /* absolute children positioned relative to this frame */
+    box-sizing: border-box;
+}
+
+/* Sudoku board: size 680 x 641, positioned by requested offsets (top:199, left:175) */
 .sudoku-container {
-    width: 400px;
-    margin: 40px auto;
-    padding: 20px;
+    position: absolute;
+    top: 199px;    /* keep same offsets */
+    left: 175px;   /* keep same offsets */
+    width: 544px;   /* 680 * 0.8 = 544 (80% of original) */
+    height: 513px;  /* 641 * 0.8 = 512.8 -> 513 */
+    padding: 0;
+    box-sizing: border-box;
     background: #f9f9f9;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
 }
 
+/* keep visual styles for grid but scale cells to the new container size */
 .sudoku-grid {
     border-collapse: collapse;
-    margin: 0 auto;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    table-layout: fixed; /* equal column widths */
 }
-
 .sudoku-grid td {
-    width: 40px;
-    height: 40px;
+    /* cells remain responsive to container so no need to hard-change widths */
+    width: calc(100% / 9);
+    height: calc(100% / 9);
     text-align: center;
-    font-size: 1.2em;
+    font-size: 1.1em; /* adjust for 80% size */
     border: 1px solid #D99069;
     background: #FFE4D6;
     transition: background-color 150ms ease, color 150ms ease;
+    box-sizing: border-box;
 }
 
-/* selected single cell */
+/* keep existing selection/related/result styles (no change) */
 .cell-selected {
-    background-color: #D99069 !important; /* specific color for clicked cell */
+    background-color: #D99069 !important;
     color: #000;
 }
-
-/* related row/column/box cells */
 .cell-related {
-    background-color: #FAC8AE !important; /* different color for row/col/box */
+    background-color: #FAC8AE !important;
     color: #000;
 }
+.cell-correct {
+    outline: 3px solid #79B461;
+    background-color: rgba(52,199,89,0.12) !important;
+}
+.cell-incorrect {
+    outline: 3px solid #FF6868;
+    background-color: rgba(255,59,48,0.08) !important;
+}
 
-/* optional: keep stronger borders for 3x3 boxes */
+/* stronger borders for 3x3 */
 .sudoku-grid tr:nth-child(3n) td {
     border-bottom: 2px solid #974525;
 }
-
 .sudoku-grid td:nth-child(3n) {
     border-right: 2px solid #974525;
 }
 
-.sudoku-grid input {
-   display: inline-flex;
-    height: 1024px;
-    padding: 328px 169px 345px 170px;
-    flex-direction: column;
-    align-items: center;
-    gap: 67px;
-}
-
-.titlepagetext {
-    color: #000;
-text-align: center;
-font-family: "Josefin Sans";
-font-size: 128px;
-font-style: normal;
-font-weight: 600;
-line-height: normal;
-}
-
-.button {
-    width: 760px;
-    height: 156px;
-    flex-shrink: 0;
-    border-radius: 38px;
-    background: linear-gradient(90deg, rgba(254, 213, 156, 0.75) 0%, rgba(201, 97, 69, 0.75) 100%);
-     border: none; /* remove default border */
-  cursor: pointer;
-  display: flex !important; /* so you can center text */
-  justify-content: center; /* horizontal centering */
-  align-items: center; 
-  color: #000;
-  font-family: "Josefin Sans", sans-serif;
-  font-size: 45px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-  text-align: center;
-}
-
-/* .sudoku-grid td.col-3 {
-    background-color: #f0f8ff; /* Light blue background for column 3 */
-/* } */ 
-
-.sudoku-area {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-/* keypad on right */
+/* Keypad positioning: use requested offsets (top:195, left:891, right:149, bottom:407)
+   This yields keypad width = 1440 - 891 - 149 = 400, height = 1024 - 195 - 407 = 422 */
 .sudoku-keypad {
+    position: absolute;
+    top: 195px;
+    left: 891px;
+    width: 400px;
+    height: 422px;
+    padding: 0;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 420px; /* fits keypad + padding */
+    justify-content: flex-start;
 }
 
-/* 3x3 keypad grid */
+/* 3x3 keypad grid (Stays centered inside the keypad area) */
 .keypad-grid {
     display: grid;
     grid-template-columns: repeat(3, 120px);
     grid-template-rows: repeat(3, 120px);
     gap: 20px;
-    padding: 10px;
-    background: transparent;
+    margin-top: 0;
+    /* center the 3x3 block horizontally */
+    justify-content: center;
+    align-content: start;
 }
 
-/* keypad button visuals */
+/* keypad buttons unchanged */
 .keypad-btn {
     width: 120px;
     height: 120px;
@@ -136,44 +120,45 @@ line-height: normal;
     align-items: center;
     justify-content: center;
     border-radius: 12px;
+    overflow: hidden;
     transition: transform 120ms ease, box-shadow 120ms ease;
 }
 .keypad-btn img {
-    width: 90px;
-    height: 90px;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     pointer-events: none;
 }
-.keypad-btn:active { transform: scale(0.98); }
 
-/* control buttons row */
+/* control buttons row — all same size and stay below keypad */
 .keypad-controls {
     display: flex;
-    gap: 16px;
-    margin-top: 20px;
+    gap: 31px;
+    margin-top: 20px;        /* space between keypad and controls */
+    width: 100%;
+    justify-content: center; /* center controls under keypad */
+    align-items: center;
 }
 .control-btn {
-    width: 120px;
-    height: 60px;
+    height: 82px;
+    padding: 0;
     border: none;
     background: transparent;
     cursor: pointer;
     border-radius: 10px;
+    overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
-.control-btn img { width: 48px; height: 48px; pointer-events: none; }
+/* original sizes restored */
+#generate-btn { width: 400px; }
+#check-btn, #solve-btn { width: 235px; }
 
-/* highlight results */
-.cell-correct {
-    outline: 3px solid #79B461;
-    background-color: rgba(52,199,89,0.12) !important;
+.control-btn img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
-.cell-incorrect {
-    outline: 3px solid #FF6868;
-    background-color: rgba(255,59,48,0.08) !important;
-}
-
-/* keep existing selection styles */
-.cell-selected { /* already present, left as-is */ }
-.cell-related { /* already present, left as-is */ }
