@@ -1,7 +1,16 @@
 {
-  "dependencies": {
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "node-fetch": "^3.3.2"
+  "name": "sudoku",
+  "version": "1.0.0",
+  "description": "Sudoku",
+  "main": "server.js",
+  "scripts": { 
+    "start": "node --watch --env-file=.env server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": { 
+    "express": "^5.1.0"
   }
 }

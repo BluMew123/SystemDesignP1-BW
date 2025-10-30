@@ -1,16 +1,16 @@
 /* used AI heavily throughout this file, as I built my project with CoPilot */
-require('dotenv').config();
 
-const express = require('express');
-const path = require('path');
+import express from 'express';  
 const app = express();
 const PORT = 3000;
 
 // keep last generated puzzle (only .puzzle) in memory
 let lastGeneratedPuzzle = null;
 
-// Serve static files (HTML, JS, CSS)
-app.use(express.static(path.join(__dirname)));
+// Serve static files from /public folder (useful when running Node locally, optional on Vercel).
+app.use(express.static('public'))
+// Define index.html as the root explicitly (useful on Vercel, optional when running Node locally).
+app.get('/', (req, res) => { res.redirect('/index.html') })
 
 // --- sample generator (stores lastGeneratedPuzzle) ---
 app.get('/api/sudokugenerate', (req, res) => {
@@ -57,6 +57,8 @@ function solveBoard(board) {
     }
     return false;
 }
+
+
 
 // --- proxy to external API (api-ninjas) or fallback to local solver ---
 // To use api-ninjas, set environment variable API_NINJAS_KEY

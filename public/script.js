@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hook up control buttons (generate / check / solve) - preserve existing behavior
     if (generateBtn) generateBtn.addEventListener('click', () => { clearHighlights(); loadGeneratedPuzzle(); });
-    if (checkBtn) checkBtn.addEventListener('click', () => { clearHighlights(false); checkAnswer(); });
+    // if (checkBtn) checkBtn.addEventListener('click', () => { clearHighlights(false); checkAnswer(); });
     if (solveBtn) solveBtn.addEventListener('click', () => { clearHighlights(false); solveMyPuzzle(); });
 
     // Replace or add this robust solver handler and wiring
